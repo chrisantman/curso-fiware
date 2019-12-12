@@ -78,6 +78,31 @@ services:
     healthcheck:
       test: curl --fail -s http://iot-agent:4041/iot/about || exit 1
 
+   keyrock:
+      image: fiware/idm:7.6.0
+      container_name: fiware-keyrock
+      hostname: keyrock
+      networks:
+            default:
+                ipv4_address: 172.18.1.5
+      depends_on:
+            - mysql-db
+      ports:
+            - "3005:3005"
+            - "443:443"
+      environment:
+            - DEBUG=idm:*
+            - IDM_DB_HOST=mysql-db
+            - IDM_HOST=http://localhost:3005
+            - IDM_PORT=3005
+            # Development use only
+            # Use Docker Secrets for Sensitive Data
+            - IDM_DB_PASS=secret
+            - IDM_DB_USER=root
+            - IDM_ADMIN_USER=admin
+            - IDM_ADMIN_EMAIL=admin@test.com
+            - IDM_ADMIN_PASS=1234
+
   # Tutorial acts as a series of dummy IoT Sensors over HTTP
   tutorial:
     image: fiware/tutorials.context-provider
@@ -114,7 +139,7 @@ services:
       - "TWITTER_CONSUMER_SECRET=<ADD_YOUR_CONSUMER_SECRET>"
     healthcheck:
       test: curl --fail -s http://tutorial:3000/version || exit 1
-
+      
   # Databases
   mongo-db:
     image: mongo:3.6
@@ -142,6 +167,26 @@ services:
     command: crate -Clicense.enterprise=false -Cauth.host_based.enabled=false  -Ccluster.name=democluster -Chttp.cors.enabled=true -Chttp.cors.allow-origin="*"
     volumes:
       - crate-db:/data
+    
+   mysql-db:
+    restart: always
+    image: mysql:5.7
+    hostname: mysql-db
+    container_name: db-mysql
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    networks:
+      default:
+        ipv4_address: 172.18.1.6
+    environment:
+      # Development use only
+      # Use Docker Secrets for Sensitive Data
+      - "MYSQL_ROOT_PASSWORD=secret"
+      - "MYSQL_ROOT_HOST=172.18.1.5"
+    volumes:
+      - mysql-db:/var/lib/mysql       
 
   # Other services
   grafana:
@@ -166,51 +211,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data 
-      
-  keyrock:
-        image: fiware/idm:7.6.0
-        container_name: fiware-keyrock
-        hostname: keyrock
-        networks:
-            default:
-                ipv4_address: 172.18.1.5
-        depends_on:
-            - mysql-db
-        ports:
-            - "3005:3005"
-            - "443:443"
-        environment:
-            - DEBUG=idm:*
-            - IDM_DB_HOST=mysql-db
-            - IDM_HOST=http://localhost:3005
-            - IDM_PORT=3005
-            # Development use only
-            # Use Docker Secrets for Sensitive Data
-            - IDM_DB_PASS=secret
-            - IDM_DB_USER=root
-            - IDM_ADMIN_USER=admin
-            - IDM_ADMIN_EMAIL=admin@test.com
-            - IDM_ADMIN_PASS=1234
-
-    mysql-db:
-        restart: always
-        image: mysql:5.7
-        hostname: mysql-db
-        container_name: db-mysql
-        expose:
-            - "3306"
-        ports:
-            - "3306:3306"
-        networks:
-            default:
-                ipv4_address: 172.18.1.6
-        environment:
-            # Development use only
-            # Use Docker Secrets for Sensitive Data
-            - "MYSQL_ROOT_PASSWORD=secret"
-            - "MYSQL_ROOT_HOST=172.18.1.5"
-        volumes:
-            - mysql-db:/var/lib/mysql     
+       
 
 networks:
   default:

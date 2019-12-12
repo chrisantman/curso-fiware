@@ -167,7 +167,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data 
       
- keyrock:
+  keyrock:
         image: fiware/idm:7.6.0
         container_name: fiware-keyrock
         hostname: keyrock

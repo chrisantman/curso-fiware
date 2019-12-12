@@ -155,6 +155,17 @@ services:
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-worldmap-panel
     volumes:
       - grafana:/var/lib/grafana
+      
+  portainer:
+    image: portainer/portainer
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - 9000:9000
+      - 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data 
 
 networks:
   default:
@@ -166,3 +177,4 @@ volumes:
   mongo-db: ~
   crate-db: ~
   grafana: ~
+  portainer_data: ~

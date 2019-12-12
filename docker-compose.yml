@@ -166,6 +166,51 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data 
+      
+ keyrock:
+        image: fiware/idm:7.6.0
+        container_name: fiware-keyrock
+        hostname: keyrock
+        networks:
+            default:
+                ipv4_address: 172.18.1.5
+        depends_on:
+            - mysql-db
+        ports:
+            - "3005:3005"
+            - "443:443"
+        environment:
+            - DEBUG=idm:*
+            - IDM_DB_HOST=mysql-db
+            - IDM_HOST=http://localhost:3005
+            - IDM_PORT=3005
+            # Development use only
+            # Use Docker Secrets for Sensitive Data
+            - IDM_DB_PASS=secret
+            - IDM_DB_USER=root
+            - IDM_ADMIN_USER=admin
+            - IDM_ADMIN_EMAIL=admin@test.com
+            - IDM_ADMIN_PASS=1234
+
+    mysql-db:
+        restart: always
+        image: mysql:5.7
+        hostname: mysql-db
+        container_name: db-mysql
+        expose:
+            - "3306"
+        ports:
+            - "3306:3306"
+        networks:
+            default:
+                ipv4_address: 172.18.1.6
+        environment:
+            # Development use only
+            # Use Docker Secrets for Sensitive Data
+            - "MYSQL_ROOT_PASSWORD=secret"
+            - "MYSQL_ROOT_HOST=172.18.1.5"
+        volumes:
+            - mysql-db:/var/lib/mysql     
 
 networks:
   default:
@@ -178,3 +223,4 @@ volumes:
   crate-db: ~
   grafana: ~
   portainer_data: ~
+  mysql-db: ~

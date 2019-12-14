@@ -114,7 +114,7 @@ services:
       - "TWITTER_CONSUMER_SECRET=<ADD_YOUR_CONSUMER_SECRET>"
     healthcheck:
       test: curl --fail -s http://tutorial:3000/version || exit 1
-
+      
   # Databases
   mongo-db:
     image: mongo:3.6
@@ -142,6 +142,7 @@ services:
     command: crate -Clicense.enterprise=false -Cauth.host_based.enabled=false  -Ccluster.name=democluster -Chttp.cors.enabled=true -Chttp.cors.allow-origin="*"
     volumes:
       - crate-db:/data
+      
 
   # Other services
   grafana:
@@ -155,7 +156,8 @@ services:
       - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-worldmap-panel
     volumes:
       - grafana:/var/lib/grafana
-
+     
+      
 networks:
   default:
     ipam:
@@ -166,3 +168,5 @@ volumes:
   mongo-db: ~
   crate-db: ~
   grafana: ~
+  portainer_data: ~
+  mysql-db: ~

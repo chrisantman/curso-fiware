@@ -137,7 +137,7 @@ services:
     image: grafana/grafana:6.1.6
     container_name: grafana
     depends_on:
-      - crate-db
+      - postgres-db
     ports:
       - "3003:3000"
     environment:

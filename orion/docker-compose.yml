@@ -18,22 +18,6 @@
 #
 version: "3.5"
 services:
-  # Orion is the context broker
-  orion:
-    image: fiware/orion:2.2.0
-    hostname: orion
-    container_name: fiware-orion
-    depends_on:
-      - mongo-db
-    networks:
-      - default
-    ports:
-      - "1026:1026" 
-    command: -dbhost mongo-db -logLevel DEBUG -noCache
-    healthcheck:
-      test: curl --fail -s http://orion:1026/version || exit 1
-
-
   # Databases
   mongo-db:
     image: mongo:3.6
@@ -48,6 +32,21 @@ services:
     command: --bind_ip_all --smallfiles
     volumes:
       - mongo-db:/data
+      
+  # Orion is the context broker
+  orion:
+    image: fiware/orion:2.2.0
+    hostname: orion
+    container_name: fiware-orion
+    depends_on:
+      - mongo-db
+    networks:
+      - default
+    ports:
+      - "1026:1026" 
+    command: -dbhost mongo-db -logLevel DEBUG -noCache
+    healthcheck:
+      test: curl --fail -s http://orion:1026/version || exit 1
 
 networks:
   default:

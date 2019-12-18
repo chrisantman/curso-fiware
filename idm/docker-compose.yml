@@ -19,7 +19,7 @@ services:
       - "IDM_DB_PASS_FILE=/run/secrets/my_secret_data"
       - "IDM_DB_USER=root"
       - "IDM_PORT=3005"
-      - "IDM_HOST=http://localhost:3005"
+      - "IDM_HOST=http://192.168.1.146:3005"
       - "IDM_HTTPS_ENABLED=true"
       - "IDM_HTTPS_PORT=3443"
       - "IDM_ADMIN_USER=admin"

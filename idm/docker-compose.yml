@@ -1,0 +1,64 @@
+version: "3.5"
+services:
+  # Keyrock is an Identity Management Front-End
+  keyrock:
+    image: fiware/idm:7.8.0
+    container_name: fiware-keyrock
+    hostname: keyrock
+    networks:
+      default:
+        ipv4_address: 172.18.1.5
+    depends_on:
+      - mysql-db
+    ports:
+      - "3005:3005" # localhost:3005
+      - "3443:3443" # localhost:3443
+    environment:
+      - "DEBUG=idm:*"
+      - "IDM_DB_HOST=mysql-db"
+      - "IDM_DB_PASS_FILE=/run/secrets/my_secret_data"
+      - "IDM_DB_USER=root"
+      - "IDM_PORT=3005"
+      - "IDM_HOST=http://localhost:3005"
+      - "IDM_HTTPS_ENABLED=true"
+      - "IDM_HTTPS_PORT=3443"
+      - "IDM_ADMIN_USER=admin"
+      - "IDM_ADMIN_EMAIL=admin@test.com"
+      - "IDM_ADMIN_PASS=1234"
+    secrets:
+      - my_secret_data
+    healthcheck:
+      test: curl --fail -s http://keyrock:3005/version || exit 1
+
+  # Database
+  mysql-db:
+    restart: always
+    image: mysql:5.7
+    hostname: mysql-db
+    container_name: db-mysql
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    networks:
+      default:
+        ipv4_address: 172.18.1.6
+    environment:
+      - "MYSQL_ROOT_PASSWORD_FILE=/run/secrets/my_secret_data"
+      - "MYSQL_ROOT_HOST=172.18.1.5" # Allow Keyrock to access this database
+    volumes:
+      - mysql-db:/var/lib/mysql
+    secrets:
+      - my_secret_data
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.18.1.0/24
+volumes:
+  mysql-db: ~
+
+secrets:
+  my_secret_data:
+    file: ./secrets.txt

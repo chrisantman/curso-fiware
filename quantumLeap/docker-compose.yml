@@ -131,7 +131,7 @@ services:
       - mongo-db:/data
 
   crate-db:
-    image: crate:${CRATE_VERSION:-3.1.2}
+    image: crate:3.1.2
     hostname: crate-db
     container_name: db-crate
     ports:
